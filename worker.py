@@ -9,8 +9,9 @@ avenues = {avenue.upper(): link for avenue, link in avenues.items()}
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--avenues', type=str, required=True, help='Avenue names')
-
+parser.add_argument('--skip-parse', action='store_true', help='Skip parsing')
 args = parser.parse_args()
+
 crawling_avenues = args.avenues.split('+')
 crawling_avenues = [avenue.upper() for avenue in crawling_avenues]
 
@@ -22,6 +23,6 @@ for avenue in crawling_avenues:
     link = avenues[avenue]
     print(f'Crawling {avenue} from {link}')
     crawler = AvenueCrawler(link)
-    crawler.crawl()
+    crawler.crawl(skip_parse=args.skip_parse)
 
     time.sleep(10)

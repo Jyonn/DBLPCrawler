@@ -16,30 +16,41 @@ class AvenueCrawler:
         self.always_update = always_update
 
         self.avenue = self.extract_meta()  # Extract conf-aaai
-        self.meta_path = os.path.join(self.avenue, 'meta.yaml')
-        self.status = self.load_meta()  # type: Dict[str, bool]
+        self.avenue_dir = os.path.join('data', self.avenue)
+        self.meta_path = os.path.join(self.avenue_dir, 'meta.yaml')
+        self.meta_parse_path = os.path.join(self.avenue_dir, 'meta-parse.yaml')
 
-        os.makedirs(self.avenue, exist_ok=True)
+        self.dl_status = self.load_meta(self.meta_path)  # type: Dict[str, bool]
+        self.parse_status = self.load_meta(self.meta_parse_path)  # type: Dict[str, bool]
 
-    def load_meta(self):
-        if os.path.exists(self.meta_path):
-            return handler.yaml_load(self.meta_path)
+        os.makedirs(self.avenue_dir, exist_ok=True)
+
+    @staticmethod
+    def load_meta(path):
+        if os.path.exists(path):
+            return handler.yaml_load(path)
         return {}
 
     def save_meta(self, status):
         # Save the status to the meta file
-        self.status = status
+        self.dl_status = status
         handler.yaml_save(status, self.meta_path)
 
-    def has_processed(self, link):
-        return self.status.get(link, False)
+    def save_meta_parse(self, status):
+        self.parse_status = status
+        handler.yaml_save(status, self.meta_parse_path)
+
+    def has_downloaded(self, link):
+        return self.dl_status.get(link, False)
+
+    def has_parsed(self, link):
+        return self.parse_status.get(link, False)
 
     def extract_meta(self):
         # https://dblp.org/db/conf/aaai/index.html -> extract conf and aaai
         parts = self.index_url.split('/')
         avenue = parts[-3] + '-' + parts[-2]
         return avenue
-
 
     def fetch(self):
         # 获取会议主页
@@ -54,29 +65,34 @@ class AvenueCrawler:
         links = soup.find_all('a', class_='toc-link')
         return [link['href'] for link in links if 'href' in link.attrs]
 
-    def crawl(self):
+    def crawl(self, skip_parse=False):
         soup = self.fetch()
         if soup is None:
             return
 
         links = self.parse(soup)
-        current_status = dict()
+        current_dl_status = dict()
+        current_status_parse = dict()
 
         for link in links:
-            if self.has_processed(link) and not self.always_update:
-                current_status[link] = True
+            crawler = PageCrawler(link)
+
+            if self.has_downloaded(link) and not self.always_update:
+                soup = None
+            else:
+                soup = crawler.crawl()
+            current_dl_status[link] = True
+            self.save_meta(current_dl_status)
+
+            time.sleep(1)
+
+            if skip_parse or (self.has_parsed(link) and not self.always_update):
                 continue
 
-            # 处理每个链接
-            crawler = PageCrawler(link)
-            crawler.crawl()
-            current_status[link] = True
+            if soup is None:
+                content = crawler.load_html()
+                soup = BeautifulSoup(content, 'lxml')
 
-            time.sleep(10)
-
-        self.save_meta(current_status)
-
-
-# 示例用法
-# crawler = AvenueCrawler('https://dblp.org/db/conf/aaai/index.html')
-# crawler.crawl()
+            crawler.parse(soup)
+            current_status_parse[link] = True
+            self.save_meta_parse(current_status_parse)

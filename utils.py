@@ -8,4 +8,3 @@ headers = {
     'Upgrade-Insecure-Requests': '1',
     'TE': 'Trailers'
 }
-

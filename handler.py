@@ -46,3 +46,11 @@ def yaml_save(obj, filepath: str):
         yaml.dump(obj, cast(SupportsWrite, f), indent=2, allow_unicode=True)
 
 
+def file_read(filepath: str) -> str:
+    with open(filepath, 'r', encoding='utf-8') as f:
+        return f.read()
+
+
+def file_write(filepath: str, content: str):
+    with open(filepath, 'w', encoding='utf-8') as f:
+        f.write(content)
