@@ -1,7 +1,6 @@
 import os
 import requests
 from bs4 import BeautifulSoup
-import yaml
 
 import handler
 import parser
@@ -12,7 +11,7 @@ class PageCrawler:
     def __init__(self, index_url):
         self.index_url = index_url  # https://dblp.org/db/conf/aaai/aaai2025.html
         self.avenue, self.name = self.extract_meta()  # Extract conf-aaai, and aaai2025
-        self.avenue_dir = os.path.join('data', self.avenue)
+        self.avenue_dir = os.path.join('../DBLP-data', self.avenue)
 
         os.makedirs(self.avenue_dir, exist_ok=True)
 

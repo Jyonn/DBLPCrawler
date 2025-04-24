@@ -1,7 +1,5 @@
 from argparse import ArgumentParser
 
-from bs4 import BeautifulSoup
-
 import handler
 
 

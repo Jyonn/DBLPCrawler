@@ -16,7 +16,7 @@ class AvenueCrawler:
         self.always_update = always_update
 
         self.avenue = self.extract_meta()  # Extract conf-aaai
-        self.avenue_dir = os.path.join('data', self.avenue)
+        self.avenue_dir = os.path.join('../DBLP-data', self.avenue)
         self.meta_path = os.path.join(self.avenue_dir, 'meta.yaml')
         self.meta_parse_path = os.path.join(self.avenue_dir, 'meta-parse.yaml')
 
@@ -27,24 +27,24 @@ class AvenueCrawler:
 
     @staticmethod
     def load_meta(path):
+        print(f'Attempting to load meta from {path}')
         if os.path.exists(path):
             return handler.yaml_load(path)
         return {}
 
-    def save_meta(self, status):
-        # Save the status to the meta file
-        self.dl_status = status
-        handler.yaml_save(status, self.meta_path)
-
-    def save_meta_parse(self, status):
-        self.parse_status = status
-        handler.yaml_save(status, self.meta_parse_path)
-
     def has_downloaded(self, link):
         return self.dl_status.get(link, False)
 
+    def downloaded(self, link):
+        self.dl_status[link] = True
+        handler.yaml_save(self.dl_status, self.meta_path)
+
     def has_parsed(self, link):
         return self.parse_status.get(link, False)
+
+    def parsed(self, link):
+        self.parse_status[link] = True
+        handler.yaml_save(self.parse_status, self.meta_parse_path)
 
     def extract_meta(self):
         # https://dblp.org/db/conf/aaai/index.html -> extract conf and aaai
@@ -71,8 +71,6 @@ class AvenueCrawler:
             return
 
         links = self.parse(soup)
-        current_dl_status = dict()
-        current_status_parse = dict()
 
         for link in links:
             crawler = PageCrawler(link)
@@ -81,10 +79,10 @@ class AvenueCrawler:
                 soup = None
             else:
                 soup = crawler.crawl()
-            current_dl_status[link] = True
-            self.save_meta(current_dl_status)
-
-            time.sleep(1)
+                time.sleep(1)
+            # current_dl_status[link] = True
+            # self.save_meta(current_dl_status)
+            self.downloaded(link)
 
             if skip_parse or (self.has_parsed(link) and not self.always_update):
                 continue
@@ -94,5 +92,6 @@ class AvenueCrawler:
                 soup = BeautifulSoup(content, 'lxml')
 
             crawler.parse(soup)
-            current_status_parse[link] = True
-            self.save_meta_parse(current_status_parse)
+            self.parsed(link)
+            # current_status_parse[link] = True
+            # self.save_meta_parse(current_status_parse)

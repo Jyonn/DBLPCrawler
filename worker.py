@@ -25,4 +25,4 @@ for avenue in crawling_avenues:
     crawler = AvenueCrawler(link)
     crawler.crawl(skip_parse=args.skip_parse)
 
-    time.sleep(10)
+    # time.sleep(10)
