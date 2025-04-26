@@ -53,8 +53,8 @@ class PageCrawler:
         print(f"Saved YAML to {self.yaml_path}")
 
     def crawl(self, strict_prefix=False):
-        if strict_prefix and not self.page_name.startswith(self.venue_type):
-            print(f"Invalid page name: {self.page_name} for venue type: {self.venue_type}, skipping.")
+        if strict_prefix and not self.page_name.startswith(self.venue_name):
+            print(f"Invalid page name: {self.page_name} for the venue: {self.venue_name}, skipping.")
             return None
         soup = self.fetch()
         if soup is None:

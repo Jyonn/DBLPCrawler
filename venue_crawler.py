@@ -24,15 +24,17 @@ class VenueType:
     @staticmethod
     def parse_journals_links(soup):
         main_div = soup.find('div', id='main')
-        ul_tag = None
+        uls = []
         for child in main_div.children:
             if child.name == 'ul':
-                ul_tag = child
-                break
-        if ul_tag is None:
-            return []
-        links = ul_tag.find_all('a')
-        return [link['href'] for link in links if 'href' in link.attrs]
+                uls.append(child)
+
+        links = []
+        for ul in uls:
+            current_links = ul.find_all('a')
+            current_links = [link['href'] for link in current_links if 'href' in link.attrs]
+            links.extend(current_links)
+        return links
 
     @classmethod
     def parse_links(cls, soup, venue_type):

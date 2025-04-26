@@ -10,6 +10,7 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--venues', type=str, required=True, help='Avenue names')
 parser.add_argument('--skip-parse', action='store_true', help='Skip parsing')
 parser.add_argument('--strict-prefix', action='store_true', help='Strict venue name')
+parser.add_argument('--always-update', action='store_true', help='Always update')
 args = parser.parse_args()
 
 crawling_venues = args.venues.split('+')
@@ -22,7 +23,7 @@ for venue in crawling_venues:
 
     link = venues[venue]
     print(f'Crawling {venue} from {link}')
-    crawler = VenueCrawler(link)
+    crawler = VenueCrawler(link, always_update=args.always_update, strict_prefix=args.strict_prefix)
     crawler.crawl(skip_parse=args.skip_parse)
 
     # time.sleep(10)
