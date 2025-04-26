@@ -9,4 +9,4 @@ headers = {
     'TE': 'Trailers'
 }
 
-root_dir: str = '../DBLP-data'
+root_dir: str = 'data'

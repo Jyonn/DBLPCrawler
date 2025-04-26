@@ -12,14 +12,13 @@ def parse(soup):
     if not main_content:
         return {}
 
-    for element in main_content.find_all(['header', 'ul']):
-        if element.page_name == 'header' and element.get('class') == ['h2']:
+    for child in main_content.children:
+        if child.name == 'header' and child.get('class') == ['h2']:
             # New track starts here
-            track_name = element.find('h2').get_text(strip=True)
+            track_name = child.find('h2').get_text(strip=True)
             current_track = track_name
-        elif element.page_name == 'ul' and 'publ-list' in (element.get('class') or []):
-            # This is a list of papers for the current track
-            for li in element.find_all('li'):
+        elif child.name == 'ul' and 'publ-list' in (child.get('class') or []):
+            for li in child.find_all('li'):
                 cite = li.find('cite')
                 if cite:
                     # Extract author and title information

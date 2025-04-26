@@ -10,7 +10,7 @@ import utils
 class PageCrawler:
     def __init__(self, index_url):
         self.index_url = index_url  # https://dblp.org/db/conf/aaai/aaai2025.html
-        self.venue_type, self.venue_name, self.page_name = self.extract_meta()  # Extract conf-aaai, and aaai2025
+        self.venue_type, self.venue_name, self.page_name = self.extract_meta()  # type: str, str, str  # Extract conf, aaai, and aaai2025
         self.venue_dir = os.path.join(utils.root_dir, f'{self.venue_type}-{self.venue_name}')
 
         os.makedirs(self.venue_dir, exist_ok=True)
@@ -52,10 +52,13 @@ class PageCrawler:
         handler.yaml_save(tracks_info, self.yaml_path)
         print(f"Saved YAML to {self.yaml_path}")
 
-    def crawl(self):
+    def crawl(self, strict_prefix=False):
+        if strict_prefix and not self.page_name.startswith(self.venue_type):
+            print(f"Invalid page name: {self.page_name} for venue type: {self.venue_type}, skipping.")
+            return None
         soup = self.fetch()
         if soup is None:
-            return {}
+            return None
         self.save_html(soup.prettify())  # Save HTML content
         return soup
 

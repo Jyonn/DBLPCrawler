@@ -1,28 +1,28 @@
 import argparse
-import time
 
 import handler
-from avenue_crawler import AvenueCrawler
+from venue_crawler import VenueCrawler
 
-avenues = handler.yaml_load('avenue.yaml')
-avenues = {avenue.upper(): link for avenue, link in avenues.items()}
+venues = handler.yaml_load('venue.yaml')
+venues = {venue.upper(): link for venue, link in venues.items()}
 
 parser = argparse.ArgumentParser()
-parser.add_argument('--avenues', type=str, required=True, help='Avenue names')
+parser.add_argument('--venues', type=str, required=True, help='Avenue names')
 parser.add_argument('--skip-parse', action='store_true', help='Skip parsing')
+parser.add_argument('--strict-prefix', action='store_true', help='Strict venue name')
 args = parser.parse_args()
 
-crawling_avenues = args.avenues.split('+')
-crawling_avenues = [avenue.upper() for avenue in crawling_avenues]
+crawling_venues = args.venues.split('+')
+crawling_venues = [venue.upper() for venue in crawling_venues]
 
-for avenue in crawling_avenues:
-    if avenue not in avenues:
-        print('Unknown avenue', avenue)
+for venue in crawling_venues:
+    if venue not in venues:
+        print('Unknown venue', venue)
         continue
 
-    link = avenues[avenue]
-    print(f'Crawling {avenue} from {link}')
-    crawler = AvenueCrawler(link)
+    link = venues[venue]
+    print(f'Crawling {venue} from {link}')
+    crawler = VenueCrawler(link)
     crawler.crawl(skip_parse=args.skip_parse)
 
     # time.sleep(10)
