@@ -27,7 +27,6 @@ def json_save(obj, filepath: str):
         json.dump(obj, cast(SupportsWrite, f), indent=2, ensure_ascii=False)
 
 
-
 def yaml_load(filepath: str):
     with open(filepath, 'r', encoding='utf-8') as f:
         return yaml.safe_load(f)

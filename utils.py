@@ -8,3 +8,5 @@ headers = {
     'Upgrade-Insecure-Requests': '1',
     'TE': 'Trailers'
 }
+
+root_dir: str = '../DBLP-data'

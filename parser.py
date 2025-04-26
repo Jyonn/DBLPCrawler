@@ -13,11 +13,11 @@ def parse(soup):
         return {}
 
     for element in main_content.find_all(['header', 'ul']):
-        if element.name == 'header' and element.get('class') == ['h2']:
+        if element.page_name == 'header' and element.get('class') == ['h2']:
             # New track starts here
             track_name = element.find('h2').get_text(strip=True)
             current_track = track_name
-        elif element.name == 'ul' and 'publ-list' in (element.get('class') or []):
+        elif element.page_name == 'ul' and 'publ-list' in (element.get('class') or []):
             # This is a list of papers for the current track
             for li in element.find_all('li'):
                 cite = li.find('cite')
