@@ -6,6 +6,7 @@ import requests
 from bs4 import BeautifulSoup
 
 import handler
+import parser
 import utils
 from page_crawler import PageCrawler
 
@@ -61,7 +62,7 @@ class VenueCrawler:
         self.always_update = always_update
         self.strict_prefix = strict_prefix
 
-        self.venue_type, self.venue_name = self.extract_meta()  # Extract conf-aaai
+        self.venue_type, self.venue_name, _ = parser.parse_link(self.index_url)
         assert self.venue_type in VenueType.ALL, ValueError(f'Invalid venue type: {self.venue_type}')
 
         self.venue_dir = os.path.join(utils.root_dir, f'{self.venue_type}-{self.venue_name}')
@@ -93,13 +94,6 @@ class VenueCrawler:
     def parsed(self, link):
         self.parse_status[link] = True
         handler.yaml_save(self.parse_status, self.meta_parse_path)
-
-    def extract_meta(self):
-        # https://dblp.org/db/conf/aaai/aaai2025.html
-        parts = self.index_url.split('/')
-        venue_type = parts[-3]
-        venue_name = parts[-2]
-        return venue_type, venue_name
 
     def fetch(self):
         # 获取会议主页

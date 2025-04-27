@@ -10,18 +10,10 @@ import utils
 class PageCrawler:
     def __init__(self, index_url):
         self.index_url = index_url  # https://dblp.org/db/conf/aaai/aaai2025.html
-        self.venue_type, self.venue_name, self.page_name = self.extract_meta()  # type: str, str, str  # Extract conf, aaai, and aaai2025
+        self.venue_type, self.venue_name, self.page_name = parser.parse_link(self.index_url)
         self.venue_dir = os.path.join(utils.root_dir, f'{self.venue_type}-{self.venue_name}')
 
         os.makedirs(self.venue_dir, exist_ok=True)
-
-    def extract_meta(self):
-        # https://dblp.org/db/conf/aaai/aaai2025.html
-        parts = self.index_url.split('/')
-        venue_type = parts[-3]
-        venue_name = parts[-2]
-        page_name = parts[-1].split('.')[0]
-        return venue_type, venue_name, page_name
 
     def fetch(self):
         response = requests.get(self.index_url, headers=utils.headers)

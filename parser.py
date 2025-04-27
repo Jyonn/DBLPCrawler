@@ -1,6 +1,15 @@
 from argparse import ArgumentParser
+from typing import Tuple
 
 import handler
+
+
+def parse_link(link: str) -> Tuple[str, str, str]:
+    parts = link.split('/')
+    venue_type = parts[-3]
+    venue_name = parts[-2]
+    page_name = parts[-1].split('.')[0]
+    return venue_type, venue_name, page_name
 
 
 def parse(soup):
